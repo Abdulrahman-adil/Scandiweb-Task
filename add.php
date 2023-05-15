@@ -1,34 +1,68 @@
-<?php 
+<?php
 $suk = "";
 $name = "";
 $price = "";
-if(isset($_POST['type'])) {
-    $type = $_POST['type'];
-} else {
-    $type = "";
-}
-if(isset($_POST['sku'])) {
-    $sku = $_POST['sku'];
-} else {
-    $sku = "";
-}
+$type = "";
+$size = "";
+$weight = "";
+$height = "";
+$width = "";
+$length = "";
 
 if ($type == "DVD-disc") {
     $size = $_POST['size'];
-    $sql = "INSERT INTO products (sku, name, price, product_type, size) VALUES ('$sku', '$name', '$price', '$type', '$size')";
+    $sql = "INSERT INTO products (sku, name, price, product_type, size) 
+            VALUES ('$sku', '$name', '$price', '$type', '$size')";
 } else if ($type == "Book") {
     $weight = $_POST['weight'];
-    $sql = "INSERT INTO products (sku, name, price, product_type, weight) VALUES ('$sku', '$name', '$price', '$type', '$weight')";
+    $sql = "INSERT INTO products (sku, name, price, product_type, weight) 
+    VALUES ('$sku', '$name', '$price', '$type', '$weight')";
 } else if ($type == "Furniture") {
     $height = $_POST['height'];
     $width = $_POST['width'];
     $length = $_POST['length'];
     $dimensions = "$height x $width x $length";
-    $sql = "INSERT INTO products (sku, name, price, product_type, dimensions) VALUES ('$sku', '$name', '$price', '$type', '$dimensions')";
+    $sql = "INSERT INTO products (sku, name, price, product_type, dimensions) 
+    VALUES ('$sku', '$name', '$price', '$type', '$dimensions')";
 } else {
-    $sql = "SELECT id, sku, name, price, product_type, size, weight, dimensions FROM products ORDER BY id ASC";}
+    $sql = "SELECT id, sku, name, price, product_type, size, weight, 
+    dimensions FROM products ORDER BY id ASC";}
+// Connect to database  
+$servername = "localhost";
+$username = "root";
+$password = "";
+$database = "products";
 
+// stablish connection 
+$connection = new mysqli($servername, $username, $password, $database);
 
+// Check Connection
+if ($connection->connect_error){
+    die("Connection failed: " . $connection->connect_error);
+}
+
+// Check if form is submitted
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get form data
+    $sku = $_POST["suk"];
+    $name = $_POST["name"];
+    $price = $_POST["price"];
+    $type = $_POST["type"];
+
+    // Insert data into database
+    $sql = "INSERT INTO products (sku, name, price, product_type, size, weight, dimensions) VALUES ('$sku', '$name', '$price', '$type', NULL, NULL, NULL)";
+
+    if ($connection->query($sql) === TRUE) {
+        // Redirect to home page
+        header("Location: home.php");
+        exit();
+    } else {
+        echo "Error: " . $sql . "<br>" . $connection->error;
+    }
+}
+
+// Close database connection
+$connection->close();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -91,7 +125,7 @@ if ($type == "DVD-disc") {
                     <label for="length" class="form-label">Length (in cm)</label>
                     <input type="number" class="form-control" name="length" id="length" value="<?php echo $length?>">
                 </div>
-        </form> 
+        </form>
         </div>
         <footer>
             Scandiweb Test Assignment
@@ -99,4 +133,4 @@ if ($type == "DVD-disc") {
     </div>
     <script src="layout/js/script.js"></script>
 </body>
-</html>
+</html> 

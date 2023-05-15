@@ -1,4 +1,7 @@
 <!-- // show all items -->
+<?php
+var_dump($_POST)
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,10 +19,10 @@
             <h2>Product List</h2>
             <div class="buttons">
                 <a class="btn btn-success" href="./add.php" role="button">Add</a>
-                <a class="btn btn-danger" role="button" href="./delete.php">Delete</a>
+                <button class="btn btn-danger delete-btn" type="button">Delete</button>
             </div>
         </div>
-        <div class="boxes d-flex">
+        <div class="boxes">
             <?php
               // Connect to database  
               $servername = "localhost";
@@ -35,28 +38,29 @@
               }
 
               // read the row from database table
-              $sql = "INSERT INTO products (sku, name, price, product_type, size, weight, dimensions) VALUES ('$sku', '$name', '$price', '$type', '$size', '$weight', '$dimensions')";
-
-              if ($connection->query($sql) === TRUE) {
-                  $_SESSION['success'] = "Product added successfully";
-                  header("Location: home.php");
-              } else {
-                  $_SESSION['error'] = "Error: " . $sql . "<br>" . $connection->error;
-                  header("Location: add.php");
-              }
+              $sql = "SELECT * FROM products";
+            //   var_dump($sql);
+ 
+              $result = $connection->query($sql);
+               
+                // var_dump($result);
+ 
+            //   var_dump($result);
+             if(!$result){
+                die("Invalid query : " . $connection->error);
+             }
               
-              $connection->close();
-
               // read data of each row
-              while($row = $res->fetch_assoc()){
-                echo "<div class='card' style='width:18rem'>";
-                echo "<input type='checkbox' class='form-check-input' id='exampleCheck1'>";
-                echo "<div class='card-body d-flex'>";
-                echo "<span>id  : " . $row['id'] . "</span>";
-                echo "<span>Sku : " . $row['sku'] . "</span>";
-                echo "<span>Name : " . $row['name'] . "</span>";
-                echo "<span>Price :  $" . $row['price'] . "</span>";
-                echo "<span>Type : " . $row['product_type'] . "</span>";
+              while($row = $result->fetch_assoc()){
+                echo "<div class='card' style=''>" .
+                     "<input type='checkbox' class='form-check-input' id='exampleCheck1'>" .
+                     "<div class='card-body d-flex'>" .
+                     "<span>id  : " . $row['id'] . "</span>" .
+                     "<span>Sku : " . $row['sku'] . "</span>" .
+                     "<span>Name : " . $row['name'] . "</span>" .
+                     "<span>Price :  $" . $row['price'] . "</span>" .
+                     "<span>Type : " . $row['product_type'] . "</span>";
+            
                 if ($row['product_type'] == "DVD-disc") {
                     echo "<span>Size : " . $row['size'] . " MB</span>";
                 } else if ($row['product_type'] == "Book") {
@@ -64,8 +68,11 @@
                 } else if ($row['product_type'] == "Furniture") {
                     echo "<span>Dimensions : " . $row['dimensions'] . " cm</span>";
                 }
-                echo "</div>";
+            
+                echo "</div></div>";
             }
+             // Close the database connection
+          $connection->close();
 
             ?>
         
@@ -74,5 +81,6 @@
             Scandiweb Test Assignment 
         </footer>
     </div>
+    <script src="layout/js/script.js"></script>
 </body>
 </html>
