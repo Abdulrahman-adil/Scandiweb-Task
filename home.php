@@ -1,7 +1,26 @@
-<!-- // show all items -->
 <?php
-var_dump($_POST)
+include 'functions/Product.php';
+session_start();
+include 'functions/connection.php';
+
+$product = new Product($connection);
+
+if (isset($_POST['item_delete_multi'])) {
+    $ids = $_POST['item_delete_id'];
+    $result = $product->deleteProducts($ids);
+
+    if ($result) {
+        $_SESSION['status'] = "Data deleted successfully";
+    } else {
+        $_SESSION['status'] = "Data not deleted successfully";
+    }
+
+    header("Location: home.php");
+}
+
+$products = $product->getAllProducts();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -15,68 +34,43 @@ var_dump($_POST)
 </head>
 <body>
     <div class="container"> 
-        <div class="title d-flex my-5">
-            <h2>Product List</h2>
-            <div class="buttons">
-                <a class="btn btn-success" href="./add.php" role="button">Add</a>
-                <button class="btn btn-danger delete-btn" type="button">Delete</button>
+        <form action="home.php " method="POST" class="home_page">
+            <div class="title d-flex my-5">
+                <h2>Product List</h2>
+                 <div class="d-flex gap-2">
+                 <a class="btn btn-success" href="./add.php" role="button">Add</a>
+                    <button class="btn btn-danger delete-btn" type="submit" name="item_delete_multi">Mass DELETE</button> 
+                 </div>
+
             </div>
-        </div>
-        <div class="boxes">
-            <?php
-              // Connect to database  
-              $servername = "localhost";
-              $username = "root";
-              $password = "";
-              $database = "products";
-              // stablish connection 
-              $connection = new mysqli($servername, $username, $password,$database);
-
-              // Check Connection
-              if ($connection->connect_error){
-                die("Connection failed: " . $connection->connect_error);
-              }
-
-              // read the row from database table
-              $sql = "SELECT * FROM products";
-            //   var_dump($sql);
- 
-              $result = $connection->query($sql);
-               
-                // var_dump($result);
- 
-            //   var_dump($result);
-             if(!$result){
-                die("Invalid query : " . $connection->error);
-             }
-              
-              // read data of each row
-              while($row = $result->fetch_assoc()){
-                echo "<div class='card' style=''>" .
-                     "<input type='checkbox' class='form-check-input' id='exampleCheck1'>" .
-                     "<div class='card-body d-flex'>" .
-                     "<span>id  : " . $row['id'] . "</span>" .
-                     "<span>Sku : " . $row['sku'] . "</span>" .
-                     "<span>Name : " . $row['name'] . "</span>" .
-                     "<span>Price :  $" . $row['price'] . "</span>" .
-                     "<span>Type : " . $row['product_type'] . "</span>";
-            
-                if ($row['product_type'] == "DVD-disc") {
-                    echo "<span>Size : " . $row['size'] . " MB</span>";
-                } else if ($row['product_type'] == "Book") {
-                    echo "<span>Weight : " . $row['weight'] . " Kg</span>";
-                } else if ($row['product_type'] == "Furniture") {
-                    echo "<span>Dimensions : " . $row['dimensions'] . " cm</span>";
-                }
-            
-                echo "</div></div>";
-            }
-             // Close the database connection
-          $connection->close();
-
-            ?>
-        
-        </div>
+            <div class="boxes">
+            <?php foreach ($products as $row): ?>
+                <div class='card'>
+                    <input type='checkbox' 
+                            class='form-check-input' 
+                            id='exampleCheck1' 
+                            name='item_delete_id[]' 
+                            value='<?php echo $row['id']; ?>'>
+                    <div class='card-body d-flex'>
+                        <!-- <span>id  : ?></span> -->
+                        <span><?php echo $row['sku']; ?></span>
+                        <span><?php echo $row['name']; ?></span>
+                        <span>$<?php echo $row['price']; ?></span>
+                        <!-- <span><?//php echo $row['product_type']; ?></span> -->
+                        <?php if ($row['product_type'] == "DVD-disc"): ?>
+                            <span>Size : <?php echo $row['size']; ?> MB</span>
+                        <?php elseif ($row['product_type'] == "Book"): ?>
+                            <span>Weight : <?php echo $row['weight']; ?> Kg</span>
+                        <?php elseif ($row['product_type'] == "Furniture"): ?>
+                            <span>Dimensions : 
+                            <?php echo $row['dimensions']; ?> X <?php echo $row['height']; ?> X <?php echo $row['width'];?>
+                            </span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+            </div>
+        </form>
         <footer>
             Scandiweb Test Assignment 
         </footer>

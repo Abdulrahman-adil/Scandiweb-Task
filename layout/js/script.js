@@ -1,7 +1,23 @@
+// submit
 function submitForm() {
     document.getElementById("product-form").submit();
 }
 
+    function submitForm() {
+        console.log("Submit button clicked"); // Add this line
+
+        var form = document.getElementById("product-form");
+        var formData = new FormData(form);
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", "add.php", true);
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                console.log(xhr.responseText);
+            }
+        };
+        xhr.send(formData);
+    }
+// this for form -- display options
     var typeField = document.getElementById("ProductType");
     var sizeField = document.getElementById("size-field");
     var weightField = document.getElementById("weight-field");
@@ -26,68 +42,34 @@ function submitForm() {
             dimensionsField.style.display = "none";
         }
     });
+      
+// All Field Are Mandatory
+ // Get the form element
+ const form = document.querySelector('.add_page');
 
-    document.addEventListener('DOMContentLoaded', () => {
-        // Get the delete button
-        const deleteBtn = document.querySelector('.delete-btn');
-        console.log(deleteBtn);
+ form.addEventListener('submit', function(event) {
+    // Check if all required fields are filled in
+    if (!form.checkValidity()) {
+        // Prevent form submission
+        event.preventDefault();
+        event.stopPropagation();
 
-        // Add event listener to the delete button
-        deleteBtn.addEventListener('click', () => {
-            // Get all checked checkboxes
-            const checkboxes = document.querySelectorAll('.form-check-input:checked');
-    
-            // Get the product IDs from the checkboxes
-            const productIds = Array.from(checkboxes).map((checkbox) => {
-                return checkbox.id.split('-')[1];
-            });
-    
-            // Make an AJAX request to delete the products
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'home.php');
-            xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-            xhr.onload = () => {
-                if (xhr.status === 200) {
-                    // Reload the page to show the updated product list
-                    location.reload();
+        // Display validation errors
+        const validationErrors = document.querySelectorAll('.invalid-feedback');
+        validationErrors.forEach(function(element) {
+            const inputField = element.previousElementSibling;
+            if (!inputField.checkValidity()) {
+                if (inputField.getAttribute('data-type') && inputField.getAttribute('data-type') !== inputField.type) {
+                    element.style.display = 'block';
+                    element.innerHTML = 'Please provide the data of indicated type.';
                 } else {
-                    console.error(xhr.statusText);
+                    element.style.display = 'block';
+                    element.innerHTML = inputField.getAttribute('data-error');
                 }
-            };
-            xhr.onerror = () => {
-                console.error(xhr.statusText);
-            };
-            xhr.send(`delete&id=${productIds.join(',')}`);
+            } else {
+                element.style.display = 'none';
+            }
         });
-    
-        // Get all checkboxes
-        const checkboxes = document.querySelectorAll('.form-check-input');
-    
-        // Add event listener to each checkbox
-        checkboxes.forEach((checkbox) => {
-            checkbox.addEventListener('change', (event) => {
-                // Get the parent card element
-                const card = event.target.closest('.card');
-    
-                // Get the product ID from the checkbox ID
-                const productId = event.target.id.split('-')[1];
-    
-                // Make an AJAX request to delete the product from the database
-                const xhr = new XMLHttpRequest();
-                xhr.open('POST', 'home.php');
-                xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-                xhr.onload = () => {
-                    if (xhr.status === 200) {
-                        // Remove the card element from the DOM
-                        location.reload();
-                    } else {
-                        console.error(xhr.statusText);
-                    }
-                };
-                xhr.onerror = () => {
-                    console.error(xhr.statusText);
-                };
-                xhr.send(`delete&id=${productId.join(',')}`);
-            });
-        });
-    });
+    }
+});
+

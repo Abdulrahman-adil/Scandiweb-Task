@@ -1,69 +1,52 @@
 <?php
-$suk = "";
-$name = "";
-$price = "";
-$type = "";
-$size = "";
-$weight = "";
-$height = "";
-$width = "";
-$length = "";
+include 'functions/Product.php';
+session_start();
+include 'functions/connection.php';
 
-if ($type == "DVD-disc") {
-    $size = $_POST['size'];
-    $sql = "INSERT INTO products (sku, name, price, product_type, size) 
-            VALUES ('$sku', '$name', '$price', '$type', '$size')";
-} else if ($type == "Book") {
-    $weight = $_POST['weight'];
-    $sql = "INSERT INTO products (sku, name, price, product_type, weight) 
-    VALUES ('$sku', '$name', '$price', '$type', '$weight')";
-} else if ($type == "Furniture") {
-    $height = $_POST['height'];
-    $width = $_POST['width'];
-    $length = $_POST['length'];
-    $dimensions = "$height x $width x $length";
-    $sql = "INSERT INTO products (sku, name, price, product_type, dimensions) 
-    VALUES ('$sku', '$name', '$price', '$type', '$dimensions')";
-} else {
-    $sql = "SELECT id, sku, name, price, product_type, size, weight, 
-    dimensions FROM products ORDER BY id ASC";}
-// Connect to database  
-$servername = "localhost";
-$username = "root";
-$password = "";
-$database = "products";
+// the connection
+$product = new Product($connection);
 
-// stablish connection 
-$connection = new mysqli($servername, $username, $password, $database);
+$sku = '';
+$name = '';
+$price = '';
+$type = '';
+$size = '';
+$weight = '';
+$height = '';
+$width = '';
+$length = '';
 
-// Check Connection
-if ($connection->connect_error){
-    die("Connection failed: " . $connection->connect_error);
-}
+if (isset($_POST['submit'])) {
+    // echo "Form Submitted";
+    // var_dump($_POST);
+    $sku = $_POST['sku'];
+    // echo $sku;
+    $name = $_POST['name'];
+    // echo $name;
+    $price = $_POST['price'];
+    $type = $_POST['type'];
 
-// Check if form is submitted
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    // Get form data
-    $sku = $_POST["suk"];
-    $name = $_POST["name"];
-    $price = $_POST["price"];
-    $type = $_POST["type"];
+    if ($type == 'DVD-disc') {
+        $size = $_POST['size'];
+    } elseif ($type == 'Book') {
+        $weight = $_POST['weight'];
+    } elseif ($type == 'Furniture') {
+        $height = $_POST['height'];
+        $width = $_POST['width'];
+        $length = $_POST['length'];
+    }
 
-    // Insert data into database
-    $sql = "INSERT INTO products (sku, name, price, product_type, size, weight, dimensions) VALUES ('$sku', '$name', '$price', '$type', NULL, NULL, NULL)";
+    $result = $product->addProduct($sku, $name, $price, $type, $size, $weight, $height, $width, $length);
 
-    if ($connection->query($sql) === TRUE) {
-        // Redirect to home page
+    if ($result) {
+        $_SESSION['status'] = "Data added successfully";
         header("Location: home.php");
-        exit();
     } else {
-        echo "Error: " . $sql . "<br>" . $connection->error;
+        $_SESSION['status'] = "Data not added successfully";
     }
 }
-
-// Close database connection
-$connection->close();
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -77,44 +60,53 @@ $connection->close();
 </head>
 <body>
     <div class="container"> 
-        <div class="title d-flex my-5">
-            <h2>Product Add</h2>
-            <div class="buttons">
-                <button onclick="submitForm()" class="btn btn-success" type="button">Save</button>
-                <a class="btn btn-danger" href="./home.php">Cancel</a>
+        <form action="add.php" method="POST" id="product-form" class="add_page" novalidate>
+            <div class="title d-flex my-5">
+                <h2>Product Add</h2>
+                <div class="buttons">
+                    <button onclick="submitForm()" class="btn btn-success" type="submit" name="submit">Save</button>
+                    <a class="btn btn-danger" href="./home.php">Cancel</a>
+                </div>
             </div>
-        </div>
-        <div class="form" >
-        <form method="post" id="product-form">
+
+            <div class="form" >
                 <div class="mb-3 same">
-                    <label for="suk" class="form-label">SUK</label>
-                    <input type="text" class="form-control" id="suk" name="suk" value="<?php echo $suk?>">
+                    <!-- <label for="sku" class="form-label">SKU</label> -->
+                    <input type="text" class="form-control" id="sku" name="sku" data-error="Pleas enter a valid SKU." required placeholder="Enter SKU" value="<?php echo $sku?>">
+                    <div class="alert alert-danger invalid-feedback">Pleas enter SKU.</div>
                 </div>
                 <div class="mb-3 same">
-                    <label for="name" class="form-label">Name</label>
-                    <input type="text" class="form-control" id="name" name="name" value="<?php echo $name?>">
+                    <!-- <label for="name" class="form-label">Name</label> -->
+                    <input type="text" class="form-control" id="name" name="name" data-error="Pleas enter a valid name." required placeholder="Enter Name"  value="<?php echo $name?>">
+                    <div class="alert alert-danger invalid-feedback">Pleas enter name.</div>
                 </div>
                 <div class="mb-3 same">
-                    <label for="price" class="form-label">Price</label>
-                    <input type="number" class="form-control" name="price" id="number" value="<?php echo $price?>">
+                    <!-- <label for="price" class="form-label">Price</label> -->
+                    <input type="number" class="form-control" name="price" id="price" data-error="Pleas enter a valid Price." required placeholder="Enter Price"  value="<?php echo $price?>">
+                    <div class="alert alert-danger invalid-feedback">Pleas enter Price.</div>
+
                 </div>
                 <div class="mb-3 same">
-                    <label for="type" class="form-label">Type Switcher</label>
-                    <select class="form-control" id="ProductType" name="type">
+                    <!-- <label for="ProductType" class="form-label">Type Switcher</label> -->
+                    <select class="form-control" id="ProductType" name="type" required data-error="Please select type.">
                         <option value="">Select Product Type</option>
                         <option value="DVD-disc">DVD-disc</option>
                         <option value="Book">Book</option>
                         <option value="Furniture">Furniture</option>
                     </select>
+                    <div class="alert alert-danger invalid-feedback">Select Type.</div>
+
                 </div>
                 <div class="mb-3 same" id="size-field" style="display:none;">
-                    <label for="size" class="form-label">Size (in MB)</label>
+                    <label for="size" class="form-label"> Size (in MB)</label>
                     <input type="number" class="form-control" name="size" id="size" value="<?php echo $size?>">
+                    <span>Please Provide : Size</span>
                 </div>
 
                 <div class="mb-3 same" id="weight-field" style="display:none;">
                     <label for="weight" class="form-label">Weight (in Kg)</label>
                     <input type="number" class="form-control" name="weight" id="weight" value="<?php echo $weight?>">
+                    <span>Please Provide : Weight</span>
                 </div>
 
                 <div class="mb-3 same" id="dimensions-field" style="display:none;">
@@ -124,9 +116,12 @@ $connection->close();
                     <input type="number" class="form-control" name="width" id="width" value="<?php echo $width?>">
                     <label for="length" class="form-label">Length (in cm)</label>
                     <input type="number" class="form-control" name="length" id="length" value="<?php echo $length?>">
+                    <span>Please Provide : Dimensions</span>
                 </div>
+            </div>
+            <div class="alert alert-danger mt-3" id="validation-errors" style="display: none;"></div>
+
         </form>
-        </div>
         <footer>
             Scandiweb Test Assignment
         </footer>

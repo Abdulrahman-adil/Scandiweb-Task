@@ -2,9 +2,23 @@ body {
   background-color: #d1cfcf;
 }
 
-.title {
+.container .title {
   justify-content: space-between;
   border-bottom: 1px solid;
+  padding: 10px 0;
+}
+.container .title button {
+  background-color: transparent;
+  color: black;
+  border-color: white;
+  transition: 0.3s;
+}
+.container .title button:hover {
+  background-color: #c57272;
+  color: #fff;
+}
+.container .home_page {
+  margin-bottom: 50px;
 }
 
 .boxes {
@@ -15,6 +29,10 @@ body {
 .boxes .card {
   margin-left: 5px;
   margin-top: 6px;
+  border: 3px solid;
+}
+.boxes .card .form-check-input {
+  cursor: pointer;
 }
 .boxes .card input {
   margin-left: 10px;
@@ -27,12 +45,14 @@ body {
 }
 
 .form {
-  width: 250px;
+  width: 400px;
+  margin: 0px auto;
 }
 .form .same {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex-direction: column;
 }
 
 footer {
