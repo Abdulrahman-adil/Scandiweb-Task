@@ -1,5 +1,6 @@
 <?php 
  // Connect to database  
+ session_start();
  $servername = "localhost";
  $username = "root";
  $password = "";
