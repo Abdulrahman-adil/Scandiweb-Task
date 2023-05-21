@@ -1,10 +1,9 @@
 <?php 
  // Connect to database  
- session_start();
  $servername = "localhost";
  $username = "root";
  $password = "";
- $database = "products";
+ $database = "my-products";
  // stablish connection 
  $connection = new mysqli($servername, $username, $password,$database);
 

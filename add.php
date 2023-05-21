@@ -1,6 +1,6 @@
 <?php
-include 'functions/Product.php';
 session_start();
+include 'functions/Product.php';
 include 'functions/connection.php';
 
 // the connection
@@ -40,7 +40,7 @@ if (isset($_POST['submit'])) {
 
     if ($result) {
         $_SESSION['status'] = "Data added successfully";
-        header("Location: home.php");
+        header("Location: index.php");
     } else {
         $_SESSION['status'] = "Data not added successfully";
     }
@@ -65,7 +65,7 @@ if (isset($_POST['submit'])) {
                 <h2>Product Add</h2>
                 <div class="buttons">
                     <button onclick="submitForm()" class="btn btn-success" type="submit" name="submit">Save</button>
-                    <a class="btn btn-danger" href="./home.php">Cancel</a>
+                    <a class="btn btn-danger" href="./index.php">Cancel</a>
                 </div>
             </div>
 

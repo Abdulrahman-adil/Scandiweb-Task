@@ -15,7 +15,7 @@ if (isset($_POST['item_delete_multi'])) {
         $_SESSION['status'] = "Data not deleted successfully";
     }
 
-    header("Location: home.php");
+    header("Location: index.php");
 }
 
 $products = $product->getAllProducts();
@@ -34,7 +34,7 @@ $products = $product->getAllProducts();
 </head>
 <body>
     <div class="container"> 
-        <form action="home.php " method="POST" class="home_page">
+        <form action="index.php " method="POST" class="home_page">
             <div class="title d-flex my-5">
                 <h2>Product List</h2>
                  <div class="d-flex gap-2">
